@@ -5,28 +5,49 @@
 
 
 
-// figure out number of bytes based on first chars of encoding
-// take the relevant bits
-// convert to hex and return
-//int my_utf8_decode(char *input, char *output): Takes a UTF8 encoded string, and returns a string, with ASCII representation where possible, and UTF8 character representation for non-ASCII characters.
+// function declarations
+int utf8_strlen(char *string);
+void my_strcopy(char *dest, const char *src);
+char *addZeros(const char *relevant_bits, int zeroes_needed);
+char* HexToBin(char* hexdec);
+char* BinToHex(char* bin);
+int get_num_bytes(char *string);
+int my_utf8_encode(char *input , char* output);
+int my_utf8_decode(char *input, char *output);
+int my_utf8_check(char *string);
+char *my_utf8_charat(char *string, int index);
 
-
-
-//int my_utf8_check(char *string): Validates that the input string is a valid UTF8 encoded string.
 
 //char *my_utf8_charat(char *string, int index): Returns the UTF8 encoded character at the location specified
 char *addZeros(const char *relevant_bits, int zeroes_needed) {
-    char *new_bin = (char *) malloc(strlen(relevant_bits) + 1);
+    char *new_bin = (char *) malloc(utf8_strlen(relevant_bits) + 1);
     // add the zeros needed to the front of the relevant bits
     for (int i = 0; i < zeroes_needed; i++) {
         new_bin[i] = '0';
     }
     // add back the relevant bits
-    for (int i = 0; i < strlen(relevant_bits); i++) {
+    for (int i = 0; i < utf8_strlen(relevant_bits); i++) {
         new_bin[i + zeroes_needed] = relevant_bits[i];
     }
-    new_bin[strlen(relevant_bits) + zeroes_needed] = '\0'; // null terminate string
+    new_bin[utf8_strlen(relevant_bits) + zeroes_needed] = '\0'; // null terminate string
     return new_bin;
+}
+
+void my_strcopy(char *dest, const char *src) {
+    // Check for NULL pointers or invalid input
+    if (dest == NULL || src == NULL) {
+        return;
+    }
+
+    // Copy characters until null terminator is encountered
+    while (*src != '\0') {
+        *dest = *src;
+        dest++;
+        src++;
+    }
+
+    // terminate the destination string
+    *dest = '\0';
 }
 
 void printString(char *prefix, unsigned char *string, int length) {
@@ -45,7 +66,7 @@ void printString(char *prefix, unsigned char *string, int length) {
 }
 
 char* HexToBin(char* hexdec){
-    int size = strlen(hexdec);
+    int size = utf8_strlen(hexdec);
     char* result = (char*)malloc(size * 4 + 1);
 
     if (result == NULL) {
@@ -251,24 +272,24 @@ char* HexToBin(char* hexdec){
 char* BinToHex(char* bin){
     // this function converts a binary string to a hex string
 // first, add zeros to the front of the binary string so that the length is a multiple of 4
-    if (strlen(bin)%4!=0){
-        int zeroes_needed = 4 - strlen(bin)%4;
-        char *new_bin = (char*)malloc(strlen(bin)+zeroes_needed+1);
+    if (utf8_strlen(bin)%4!=0){
+        int zeroes_needed = 4 - utf8_strlen(bin)%4;
+        char *new_bin = (char*)malloc(utf8_strlen(bin)+zeroes_needed+1);
         // add the zeros needed to the front of the relevant bits
         for (int i=0; i<zeroes_needed; i++){
             new_bin[i] = '0';
         }
         // add back the relevant bits
-        for (int i=0; i<strlen(bin); i++){
+        for (int i=0; i<utf8_strlen(bin); i++){
             new_bin[i+zeroes_needed] = bin[i];
         }
-        new_bin[strlen(bin)+zeroes_needed] = '\0'; // null terminate string
+        new_bin[utf8_strlen(bin)+zeroes_needed] = '\0'; // null terminate string
         bin = new_bin;
     }
     // now convert the binary string to a hex string
-    char *hex = (char*)malloc(strlen(bin)/4+1);
+    char *hex = (char*)malloc(utf8_strlen(bin)/4+1);
     int hex_index = 0;
-    for (int i=0; i<strlen(bin); i+=4) {
+    for (int i=0; i<utf8_strlen(bin); i+=4) {
         // get the 4 bits
         char *four_bits = (char *) malloc(5);
         for (int j = 0; j < 4; j++) {
@@ -331,14 +352,14 @@ int my_utf8_encode(char *input , char* output){
 
 
     // build a new string without the unicode prefix
-    unicode_string = malloc(sizeof(char)*strlen(input));
-    for (int i=0; i<strlen(input)-2; i++){
+    unicode_string = malloc(6);
+    for (int i=0; i<utf8_strlen(input)-2; i++){
         unicode_string[i] = input[i+2];
     }
-    unicode_string[strlen(input)-2] = '\0'; // null terminate string
+    unicode_string[utf8_strlen(input)-2] = '\0'; // null terminate string
 
     // make sure it has valid number of characters for a unicode string
-    if (strlen(unicode_string)!=4 && strlen(unicode_string)!=5){
+    if (utf8_strlen(unicode_string)!=4 && utf8_strlen(unicode_string)!=5){
         return 1;
     }
 
@@ -352,15 +373,15 @@ int my_utf8_encode(char *input , char* output){
     int num_bits = 0;
     int result_index = 0;
     // the utf encoding process may require up to an additional 11 bits
-    char *relevant_bits = (char*)malloc(strlen(bin)+25);
+    char *relevant_bits = (char*)malloc(utf8_strlen(bin)+25);
     bool found = false;
 
-    for (int i=0; i<strlen(bin); i++){
+    for (int i=0; i<utf8_strlen(bin); i++){
         // find the location of the first non-zero bit
         if (bin[i]=='1') {
             // set the number of bits if it hasn't been set yet
             if (!found){
-                num_bits = strlen(bin) - i;
+                num_bits = utf8_strlen(bin) - i;
             }
             found = true;
         }
@@ -406,14 +427,14 @@ int my_utf8_encode(char *input , char* output){
 
         int r_bits_index = 0;
         // allocate space for the new binary string with the UTF8 encoding which will be 1 bit longer
-        char *new_bin = (char*)malloc(strlen(relevant_bits)+2);
+        char *new_bin = (char*)malloc(utf8_strlen(relevant_bits)+2);
 
         // add 0 to the front of the relevant bits
         new_bin[0] = '0';
-        for (int i=1; i<strlen(relevant_bits)+1; i++){
+        for (int i=1; i<utf8_strlen(relevant_bits)+1; i++){
             new_bin[i] = relevant_bits[r_bits_index++];
         }
-        new_bin[strlen(relevant_bits)+2] = '\0'; // null terminate string
+        new_bin[utf8_strlen(relevant_bits)+2] = '\0'; // null terminate string
 
         free(relevant_bits);  // Free the relevant bits - no longer needed
         relevant_bits = new_bin;
@@ -429,7 +450,7 @@ int my_utf8_encode(char *input , char* output){
         relevant_bits = addZeros(relevant_bits, zeroes_needed);
 
         // allocate space for the new binary string with the UTF8 encoding which will be 5 bits longer
-        char *new_bin = (char*)malloc(strlen(relevant_bits)+6);
+        char *new_bin = (char*)malloc(utf8_strlen(relevant_bits)+6);
 
         // add 110 to the front of the relevant bits and 10 to the front of the last 6 bits
 
@@ -447,7 +468,7 @@ int my_utf8_encode(char *input , char* output){
         for (int i=10; i<16; i++){
             new_bin[i] = relevant_bits[r_bits_index++];
         }
-        new_bin[strlen(new_bin)+1] = '\0'; // null terminate string
+        new_bin[utf8_strlen(new_bin)+1] = '\0'; // null terminate string
         free(relevant_bits);  // Free the relevant bits - no longer needed
         relevant_bits = new_bin;
 
@@ -463,7 +484,7 @@ int my_utf8_encode(char *input , char* output){
 
 
         // add 1110 to the front of the first 4 relevant bits
-        char *new_bin = (char*)malloc(strlen(relevant_bits)+9);
+        char *new_bin = (char*)malloc(utf8_strlen(relevant_bits)+9);
         new_bin[0] = '1';
         new_bin[1] = '1';
         new_bin[2] = '1';
@@ -486,7 +507,7 @@ int my_utf8_encode(char *input , char* output){
         for (int i=18; i<24; i++){
             new_bin[i] = relevant_bits[r_bits_index++];
         }
-        new_bin[strlen(new_bin)+1] = '\0'; // null terminate string
+        new_bin[utf8_strlen(new_bin)+1] = '\0'; // null terminate string
 
         free(relevant_bits);  // Free the relevant bits - no longer needed
         relevant_bits = new_bin;
@@ -504,7 +525,7 @@ int my_utf8_encode(char *input , char* output){
 
 
         // add 11110 to the front of the first 3 relevant bits
-        char *new_bin = (char*)malloc(strlen(relevant_bits)+12);
+        char *new_bin = (char*)malloc(utf8_strlen(relevant_bits)+12);
         new_bin[0] = '1';
         new_bin[1] = '1';
         new_bin[2] = '1';
@@ -535,7 +556,7 @@ int my_utf8_encode(char *input , char* output){
         for (int i=26; i<32; i++){
             new_bin[i] = relevant_bits[r_bits_index++];
         }
-        new_bin[strlen(new_bin)] = '\0'; // null terminate string
+        new_bin[utf8_strlen(new_bin)] = '\0'; // null terminate string
         printf("UTF8 binary string is %s\n", new_bin);
         free(relevant_bits);  // Free the relevant bits - no longer needed
         relevant_bits = new_bin;
@@ -548,9 +569,9 @@ int my_utf8_encode(char *input , char* output){
     char* hex = BinToHex(relevant_bits);
     free(relevant_bits);  // Free the relevant bits - no longer needed
     // Null terminate the hex string
-    hex[strlen(hex)] = '\0';
-    // Copy the result string to the output parameter using str copy function
-    strcpy(output, hex);
+    hex[utf8_strlen(hex)] = '\0';
+    // Copy the result string to the output parameter using my str copy function
+    my_strcopy(output, hex);
     // free(hex);  // Free the hex string - no longer needed
     return 0;
 }
@@ -564,7 +585,7 @@ int my_utf8_decode(char *input, char *output){
 
 
     // step two - determine the number of bytes used
-    int num_bytes = strlen(bin)/8;
+    int num_bytes = utf8_strlen(bin)/8;
 
     // step three - get the relevant bits from the binary string - removing the bits added for the UTF8 encoding
     char *relevant_bits = (char*)malloc(64);
@@ -572,7 +593,7 @@ int my_utf8_decode(char *input, char *output){
     // 1 byte: 0xxxxxxx
     if (num_bytes==1) {
         // get all the bits from the binary string except the first 0
-        for (int i = 1; i < strlen(bin); i++) {
+        for (int i = 1; i < utf8_strlen(bin); i++) {
             relevant_bits[r_bits_index++] = bin[i];
         }
     }
@@ -628,8 +649,8 @@ int my_utf8_decode(char *input, char *output){
         // add the unicode prefix to the hex string and add zeroes if needed
         unicode[0] = '\\';
         unicode[1] = 'u';
-        if (strlen(hex)<4){
-            int zeroes_needed = 4 - strlen(hex);
+        if (utf8_strlen(hex)<4){
+            int zeroes_needed = 4 - utf8_strlen(hex);
             for (int i=2; i<2+zeroes_needed; i++){
                 unicode[i] = '0';
             }
