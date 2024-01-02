@@ -6,20 +6,24 @@
 
 
 // function declarations
-int utf8_strlen(char *string);
-void my_strcopy(char *dest, const char *src);
-char *addZeros(const char *relevant_bits, int zeroes_needed);
-char* HexToBin(char* hexdec);
-char* BinToHex(char* bin);
-int get_num_bytes(char *string);
-int my_utf8_encode(char *input , char* output);
-int my_utf8_decode(char *input, char *output);
-int my_utf8_check(char *string);
-char *my_utf8_charat(char *string, int index);
+int utf8_strlen(unsigned char *string);
+void my_strcopy(unsigned char *dest, unsigned char *src);
+unsigned char *addZeros(unsigned char *relevant_bits, int zeroes_needed);
+unsigned char* HexToBin(unsigned char* hexdec);
+unsigned char* BinToHex(unsigned char* bin);
+unsigned char hexCharToByte(unsigned char hex);
+void hexStringToBytes(unsigned char* hexString, unsigned char* bytes);
+int get_num_bytes(unsigned char *string);
+int my_utf8_decode(unsigned char *input, unsigned char *output);
+int encode_single_point(unsigned char *input , unsigned char* output);
+int utf8HexToUnicode(unsigned char *input, unsigned char *output);
+int count_utf8_chars(unsigned char* string);
+int my_utf8_check(unsigned char *string);
+unsigned char *my_utf8_charat(unsigned char *string, int index);
 
 
 //char *my_utf8_charat(char *string, int index): Returns the UTF8 encoded character at the location specified
-char *addZeros(const char *relevant_bits, int zeroes_needed) {
+unsigned char *addZeros(unsigned char *relevant_bits, int zeroes_needed) {
     char *new_bin = (char *) malloc(utf8_strlen(relevant_bits) + 1);
     // add the zeros needed to the front of the relevant bits
     for (int i = 0; i < zeroes_needed; i++) {
@@ -33,7 +37,7 @@ char *addZeros(const char *relevant_bits, int zeroes_needed) {
     return new_bin;
 }
 
-void my_strcopy(char *dest, const char *src) {
+void my_strcopy(unsigned char *dest, unsigned char *src) {
     // Check for NULL pointers or invalid input
     if (dest == NULL || src == NULL) {
         return;
@@ -50,7 +54,7 @@ void my_strcopy(char *dest, const char *src) {
     *dest = '\0';
 }
 
-void printString(char *prefix, unsigned char *string, int length) {
+void printString(unsigned char *prefix, unsigned char *string, int length) {
     printf("printing out characters for string %s\n", prefix);
     for (int i = 0; i < length; i++) {
         printf("  %s: location %d, char=0x%x\n", prefix, i, string[i]);
@@ -65,7 +69,7 @@ void printString(char *prefix, unsigned char *string, int length) {
     printf("\n");
 }
 
-char* HexToBin(char* hexdec){
+unsigned char* HexToBin(unsigned char* hexdec){
     int size = utf8_strlen(hexdec);
     char* result = (char*)malloc(size * 4 + 1);
 
@@ -206,7 +210,31 @@ char* HexToBin(char* hexdec){
 
                     }
                 break;
+            case 'a':
+                // here making the value 1010 and adding it to the char
+                for (int j=0; j<4; j++){
+                    if (j==1 || j==3){
+                        result[result_index++] = '0';
+                    }
+                    else{
+                        result[result_index++] = '1';
+                    }
+
+                }
+                break;
                 case 'B':
+                    // here making the value 1011 and adding it to the char
+                    for (int j=0; j<4; j++){
+                        if (j==1){
+                            result[result_index++] = '0';
+                        }
+                        else{
+                            result[result_index++] = '1';
+                        }
+
+                    }
+                break;
+                case 'b':
                     // here making the value 1011 and adding it to the char
                     for (int j=0; j<4; j++){
                         if (j==1){
@@ -230,7 +258,31 @@ char* HexToBin(char* hexdec){
 
                     }
                 break;
+                case 'c':
+                    // here making the value 1100 and adding it to the char
+                    for (int j=0; j<4; j++){
+                        if (j==2 || j==3){
+                            result[result_index++] = '0';
+                        }
+                        else{
+                            result[result_index++] = '1';
+                        }
+
+                    }
+                break;
                 case 'D':
+                    // here making the value 1101 and adding it to the char
+                    for (int j=0; j<4; j++){
+                        if (j==2){
+                            result[result_index++] = '0';
+                        }
+                        else{
+                            result[result_index++] = '1';
+                        }
+
+                    }
+                break;
+                case 'd':
                     // here making the value 1101 and adding it to the char
                     for (int j=0; j<4; j++){
                         if (j==2){
@@ -254,7 +306,25 @@ char* HexToBin(char* hexdec){
 
                     }
                 break;
+                case 'e':
+                    // here making the value 1110 and adding it to the char
+                    for (int j=0; j<4; j++){
+                        if (j==3){
+                            result[result_index++] = '0';
+                        }
+                        else{
+                            result[result_index++] = '1';
+                        }
+
+                    }
+                break;
                 case 'F':
+                    // here making the value 1111 and adding it to the char
+                    for (int j=0; j<4; j++){
+                        result[result_index++] = '1';
+                    }
+                break;
+                case 'f':
                     // here making the value 1111 and adding it to the char
                     for (int j=0; j<4; j++){
                         result[result_index++] = '1';
@@ -269,7 +339,7 @@ char* HexToBin(char* hexdec){
     return result;
 }
 
-char* BinToHex(char* bin){
+unsigned char* BinToHex(unsigned char* bin){
     // this function converts a binary string to a hex string
 // first, add zeros to the front of the binary string so that the length is a multiple of 4
     if (utf8_strlen(bin)%4!=0){
@@ -337,9 +407,45 @@ char* BinToHex(char* bin){
     hex[hex_index] = '\0'; // null terminate string
     return hex;
 }
-// go from unicode to UTF8
-// takes an input string and returns a UTF8 encoded string
-int my_utf8_encode(char *input , char* output){
+
+// Function to convert a hexadecimal character to its integer value
+unsigned char hexCharToByte(unsigned char hex) {
+    if (hex >= '0' && hex <= '9') {
+        return hex - '0';
+    } else if (hex >= 'A' && hex <= 'F') {
+        return hex - 'A' + 10;
+    } else if (hex >= 'a' && hex <= 'f') {
+        return hex - 'a' + 10;
+    } else {
+        // Invalid hexadecimal character
+        return 0;
+    }
+}
+
+// Function to convert a hexadecimal string to an array of bytes
+void hexStringToBytes(unsigned char* hexString, unsigned char* bytes) {
+    size_t len = utf8_strlen(hexString);
+
+    size_t byteLen = len / 2;
+    if (len % 2 != 0) {
+        // Odd number of characters - add a leading zero
+        bytes[0] = hexCharToByte(hexString[0]);
+        byteLen++;
+        hexString++;
+    }
+
+
+    for (size_t i = 0; i < byteLen; ++i) {
+        char msb = hexString[i * 2];
+        char lsb = hexString[i * 2 + 1];
+        bytes[i] = (hexCharToByte(msb) << 4) | hexCharToByte(lsb);
+    }
+}
+
+
+
+// Helper function for encode - go from unicode to UTF8 for a single point
+int encode_single_point(unsigned char *input , unsigned char* output){
     char *unicode_string;
     char *bin;
     // step 1: convert the unicode to binary
@@ -362,6 +468,7 @@ int my_utf8_encode(char *input , char* output){
     if (utf8_strlen(unicode_string)!=4 && utf8_strlen(unicode_string)!=5){
         return 1;
     }
+
 
 
     // convert the unicode string to binary
@@ -557,7 +664,6 @@ int my_utf8_encode(char *input , char* output){
             new_bin[i] = relevant_bits[r_bits_index++];
         }
         new_bin[utf8_strlen(new_bin)] = '\0'; // null terminate string
-        printf("UTF8 binary string is %s\n", new_bin);
         free(relevant_bits);  // Free the relevant bits - no longer needed
         relevant_bits = new_bin;
     }
@@ -570,18 +676,126 @@ int my_utf8_encode(char *input , char* output){
     free(relevant_bits);  // Free the relevant bits - no longer needed
     // Null terminate the hex string
     hex[utf8_strlen(hex)] = '\0';
+
     // Copy the result string to the output parameter using my str copy function
     my_strcopy(output, hex);
-    // free(hex);  // Free the hex string - no longer needed
+
+
     return 0;
 }
 
-// go from utf8 to unicode - takes a UTF8 encoded string and returns a unicode string
-int my_utf8_decode(char *input, char *output){
+// Function to encode multiple Unicode points into a combined UTF-8 string
+int my_utf8_encode(char *input, char *output) {
+    // Assuming input is a string containing multiple Unicode points with no spaces
+    // loop through the string and encode each point
+    // pointer to be used later when converting to an array of bytes
+    char* output_String = (char*)malloc(utf8_strlen(input) * 4 + 1);
+    char* front_of_output_string = output_String;
+    while (*input!='\0') {
+
+        if (input[0] != '\\' && input[1] != 'u') {
+            // if it's not a unicode point, just add it to the output string
+            *output_String = *input;
+            output_String++;
+            input++;
+
+        }
+        // otherwise if is a unicode point - get the next 6 characters
+        if (input[0] == '\\' && input[1] == 'u') {
+            char *point = (char *) malloc(7);
+            for (int i = 0; i < 6; i++) {
+                point[i] = input[i];
+            }
+            // check the next character - it could be the unicode has 7 characters
+            // if it's a slash or space the unicode has 6 characters and is done
+            if (input[6] == '\\' || input[6] == ' ') {
+                point[6] = '\0'; // null terminate string
+                // encode the point and add it to the output string
+                char* hex_String = (char*)malloc(utf8_strlen(point) * 2 + 1);
+                char* front_of_hexstring = hex_String;
+                encode_single_point(point, hex_String);
+                // Convert the hex string to an array of bytes
+                // Passing in a pointer to the front of the hex string that was saved in front_of_output_string earlier
+                // the array will be written to the output parameter
+
+
+                // Convert the hexadecimal string to bytes
+                hexStringToBytes(front_of_hexstring, hex_String);
+
+                // Null-terminate the array
+                hex_String[utf8_strlen(hex_String)+1] = '\0';
+
+                // copy the hex string to the output string
+                my_strcopy(output_String, hex_String);
+
+                // move the pointer to the next location
+                output_String += utf8_strlen(output_String)+1;
+
+                // move to the next point - 6 characters ahead
+                input += 6;
+            } else {
+                // if it's not a slash, the unicode has 7 characters
+                point[6] = input[6];
+                point[7] = '\0'; // null terminate string
+                char* hex_String = (char*)malloc(utf8_strlen(point) * 2 + 1);
+                char* front_of_hexstring = hex_String;
+                encode_single_point(point, hex_String);
+                // Convert the hex string to an array of bytes
+                // Passing in a pointer to the front of the hex string that was saved in front_of_output_string earlier
+                // the array will be written to the output parameter
+
+
+                // Convert the hexadecimal string to bytes
+                hexStringToBytes(front_of_hexstring, hex_String);
+
+                // Null-terminate the array
+                hex_String[utf8_strlen(hex_String)+1] = '\0';
+
+                // copy the hex string to the output string
+                my_strcopy(output_String, hex_String);
+
+                // move the pointer to the next location
+                output_String += utf8_strlen(output_String)+3;
+                // move to the next point - 7 characters ahead
+                input += 7;
+            }
+
+            free(point);  // Free the point - no longer needed
+
+        }
+    }
+    // Null-terminate the output string
+    output_String[utf8_strlen(output_String)+1] = '\0';
+
+    my_strcopy(output, front_of_output_string);
+
+
+    return 0;
+
+}
+
+// Helper function for decode
+// Goes from utf8 to unicode - takes a singular UTF8 encoded char and returns a unicode point
+int utf8HexToUnicode(unsigned char *input, unsigned char *output){
     // allocate space for unicode string
     char *unicode = (char*)malloc(9);
     // step one - convert the hex to binary
-    char *bin = HexToBin(input);
+    // transform the input string into a string of it's hex values to be converted to binary
+    char *hex_string = (char*)malloc(get_num_bytes(input)*2+1);
+    int bytes = get_num_bytes(input);
+    // loop through the bytes of the input string
+    for(int i =0; i< bytes;i++){
+        // get the hex format of the byte and store it using snprintf
+        // * 2 - since each byte is 2 hex characters
+        // %02X - format specifier for hex the 2 means no more than 2 characters
+        snprintf(hex_string+i*2, 3, "%2X", input[i]);
+    }
+    hex_string[get_num_bytes(input)*2+1] = '\0'; // null terminate string
+
+
+    // pass that hex string into the HexToBin function to get the binary string
+
+    char *bin = HexToBin(hex_string);
 
 
     // step two - determine the number of bytes used
@@ -649,6 +863,7 @@ int my_utf8_decode(char *input, char *output){
         // add the unicode prefix to the hex string and add zeroes if needed
         unicode[0] = '\\';
         unicode[1] = 'u';
+        // if the hex string is less than 4 characters, add zeroes to the front
         if (utf8_strlen(hex)<4){
             int zeroes_needed = 4 - utf8_strlen(hex);
             for (int i=2; i<2+zeroes_needed; i++){
@@ -660,30 +875,97 @@ int my_utf8_decode(char *input, char *output){
             }
             unicode[6] = '\0'; // null terminate string
         }
-        else{
+
+        else if (utf8_strlen(hex)==4){
             int hex_index = 0;
             for (int i=2; i<6; i++){
                 unicode[i] = hex[hex_index++];
             }
             unicode[6] = '\0'; // null terminate string
         }
+        else if (utf8_strlen(hex)==5) {
+            int hex_index = 0;
+            for (int i = 2; i < 7; i++) {
+                unicode[i] = hex[hex_index++];
+            }
+            unicode[7] = '\0'; // null terminate string
+        }
+        // could have a leading zero - check for this
+        else if (utf8_strlen(hex)==6){
+            if (hex[0]=='0') {
+                int hex_index = 1;
+                for (int i = 2; i < 8; i++) {
+                    unicode[i] = hex[hex_index++];
+                }
+            }
+            else{
+                return -1;
+            }
+        }
 
-
+        else{
+            return -1;
+        }
 
     // copy the unicode string to the output parameter
-    strcpy(output, unicode);
+    my_strcopy(output, unicode);
 
     free(unicode);  // Free the unicode string - no longer needed
 
     return 0;
 }
 
-int my_utf8_check(char *string){
+// this function takes in a whole utf8 hex string and returns the unicode points for each character
+// Function to decode multiple UTF-8 hex values
+// Function to decode multiple UTF-8 encoded points
+int my_utf8_decode(unsigned char *input, unsigned char *output) {
+    while (*input != '\0') {
+        // get the number of bytes for the character
+        int num_bytes = get_num_bytes(input);
+        // if the number of bytes is -1, there was an error
+        if (num_bytes == -1) {
+            return -1;
+        }
+        // if the number of bytes is 1, the character is ascii
+        else if (num_bytes == 1) {
+            // copy the current character to the output string
+            *output = *input;
+            // move the output pointer
+            output += utf8_strlen(output);
+            // increment the input pointer one byte
+            input++;
+        }
+        // if the number of bytes is greater than 1, the character is UTF8 and we need to decode it to unicode
+        else {
+            // allocate space for the hex string
+            char *hex = (char *) malloc(9);
+            // get the hex string for the character
+            for (int i = 0; i < num_bytes; i++) {
+                hex[i] = input[i];
+            }
+            hex[num_bytes] = '\0'; // null terminate string
+            // decode the hex string to unicode
+            utf8HexToUnicode(hex, output);
+            // move the output pointer
+            output += utf8_strlen(output);
+            // increment the input pointer
+            input += num_bytes;
+            // free the hex string - no longer needed
+            free(hex);
+        }
+
+    }
+
+    return 0;
+}
+
+
+int my_utf8_check(unsigned char *string){
     return 0;
 }
 
 // helper function to find the number of bytes of a UTF8 character
-int get_num_bytes(char *string){
+int get_num_bytes(unsigned char *string){
     // if the highest bit of the byte is zero - it's a single byte character
     if ((*string & 0b10000000) == 0) {
         return 1;
@@ -702,7 +984,8 @@ int get_num_bytes(char *string){
     }
 }
 
-int utf8_strlen(char *string) {
+
+int utf8_strlen(unsigned char *string) {
     int length = 0;
 
     while (*string != '\0') {
@@ -736,37 +1019,127 @@ int utf8_strlen(char *string) {
     return length;
 }
 
-char *my_utf8_charat(char *string, int index){
-    // get the length of the string using the function above
+unsigned char *my_utf8_charat(unsigned char *string, int index){
+    // get the length of the utf8 string
     int length = utf8_strlen(string);
     // if the index is greater than the length of the string or less than 0 - return null
     if (index>length || index<0){
         return NULL;
     }
+    // otherwise - increment the pointer and keep track of chars encountered until the index is reached
+    int chars_encountered = 0;
+    while (chars_encountered<index){
+        // if the highest bit of the byte is zero - it's a single byte character
+        if ((*string & 0b10000000) == 0) {
+            chars_encountered++;
+            // move to the next byte
+            string++;
+            // if the highest 3 bits of the byte are 110 - it's a two byte character
+        } else if ((*string & 0b11100000) == 0b11000000) {
+            // Two-byte character
+            chars_encountered++;
+            // move two bytes ahead
+            string += 2;
+            // if the highest 4 bits of the byte are 1110 - it's a three byte character
+        } else if ((*string & 0b11110000) == 0b11100000) {
+            // Three-byte character
+            chars_encountered++;
+            string += 3;
+            // if the highest 5 bits of the byte are 11110 - it's a four byte character
+        } else if ((*string & 0b11111000) == 0b11110000) {
+            // Four-byte character
+            chars_encountered++;
+            string += 4;
+        }
+    }
 
-
-    return "a";
+    // once the loop has been exited - the pointer is now pointing to the start of the character at the index
+    // return the pointer
+    return string;
 }
 
+// this function takes in a string and returns the number of utf8 characters (non-ascii) in the string
+int count_utf8_chars(unsigned char* string){
+    // get the length of the string
+    int length = utf8_strlen(string);
+    int result = 0;
+    // get the number of bytes in the string
+    int num_bytes = get_num_bytes(string);
+    if (num_bytes == -1){
+        return -1;
+    }
+    // if there is exactly the same number of bytes as the length, each character is a single byte character
+    // this means there are no utf8 characters in the string so return 0
+    else if (num_bytes == length){
+        return result;
+    }
+
+    // loop through the string to find the utf8 characters
+    while (*string != '\0') {
+        if ((*string & 0b10000000) == 0) {
+            // it's an ascii character - move to the next byte
+            string++;
+            // if the highest 3 bits of the byte are 110 - it's a two byte character
+        } else if ((*string & 0b11100000) == 0b11000000) {
+            // Two-byte character
+            result++;
+            // move two bytes ahead
+            string += 2;
+            // if the highest 4 bits of the byte are 1110 - it's a three byte character
+        } else if ((*string & 0b11110000) == 0b11100000) {
+            // Three-byte character
+            result++;
+            string += 3;
+            // if the highest 5 bits of the byte are 11110 - it's a four byte character
+        } else if ((*string & 0b11111000) == 0b11110000) {
+            // Four-byte character
+            result++;
+            string += 4;
+        }
+    }
+        return result;
+}
+
+
+
 int main() {
-    unsigned char *str1 = "\\u0418";
-    unsigned char *str2 = "D098";
-    int max_output = 8;
+    unsigned char *str1 = "ho \\u0418\\u00A3\\u10348";
+    unsigned char *str2 = "И£𐍈";
+    unsigned char* str3 = "f0908d88";
+    int max_output = (utf8_strlen(str1 )*8);
 
     // allocate memory for the output and pass in a pointer to the memory
-    char* out = (char*)malloc(max_output+1);
+    char* hex = (char*)malloc(max_output + 1);
 
-    my_utf8_encode(str1,out);
+    printf("Input for encoding: %s\n", str1);
 
-    printf("Output for encoding: %s\n",out );
+    my_utf8_encode(str1, hex);
+
+    printf("Output for encoding: %s\n", hex );
+
 
     char *output2 = (char*)malloc(max_output+1);
 
-    my_utf8_decode(str2,output2);
+    printf("Input for decoding: %s\n", str2);
+
+    my_utf8_decode(str2, output2);
     printf("Output for decoding: %s\n",output2 );
+
+    int max_output3 = (utf8_strlen(str3 )*8);
+    char *output3 = (char*)malloc(max_output3+1);
+
+//    char *inputString = "Answer";
+//    char *s = my_utf8_charat(inputString, 2);
+//    printf("Character at index 2 of %s is %s\n", inputString, s);
+
+//    for (int i = 0; i < 10; i++) {
+//        printf("Character at index %d of %s is %x\n", i, str2, str2[i]);
+//    }
+
 
 
 
     return 0;
+
 }
 
