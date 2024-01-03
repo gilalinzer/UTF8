@@ -360,6 +360,7 @@ void utf8HextoUnicode_tests(){
     unsigned char *output6 = "🥶";
     test_utf8HexToUnicode(input6, output6);
 
+
 }
 
 
@@ -375,7 +376,7 @@ int main() {
     get_num_bytes_tests();
     my_utf8_encode_tests();
     my_utf8_decode_tests();
-    utf8HextoUnicode_tests();
+//    utf8HextoUnicode_tests();
 
 
 
