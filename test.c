@@ -367,7 +367,7 @@ int main() {
     hexStringToBytes_tests();
     get_num_bytes_tests();
     my_utf8_encode_tests();
-//    my_utf8_decode_tests();
+    my_utf8_decode_tests();
     utf8HextoUnicode_tests();
 
 
