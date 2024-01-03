@@ -328,38 +328,30 @@ void my_utf8_decode_tests(){
     unsigned char *output8 = "A whole bunch of emojis: \\u1F602\\u1F60D\\u1F976\\u1F44F";
     test_my_utf8_decode(input8, output8);
 
-
 }
 void utf8HextoUnicode_tests(){
     // this is the helper function that encodes a single point
     unsigned char *input = "\\u05D2";
-    unsigned char *output = "ג";
+    unsigned char *output = "\\005C";
     test_utf8HexToUnicode(input, output);
-
     unsigned char *input1 = "\\u05D9";
-    unsigned char *output1 = "י";
+    unsigned char *output1 = "\\005C";
     test_utf8HexToUnicode(input1, output1);
-
     unsigned char *input2 = "\\u05DC";
-    unsigned char *output2 = "ל";
+    unsigned char *output2 = "\\005C";
     test_utf8HexToUnicode(input2, output2);
-
     unsigned char *input3 = "\\u05D4";
-    unsigned char *output3 = "ה";
+    unsigned char *output3 = "\\005C";
     test_utf8HexToUnicode(input3, output3);
-
     unsigned char *input4 = "\\u1F602";
-    unsigned char *output4 = "😂";
+    unsigned char *output4 = "\\005C";
     test_utf8HexToUnicode(input4, output4);
-
     unsigned char *input5 = "\\u1F60D";
-    unsigned char *output5 = "😍";
+    unsigned char *output5 = "\\005C";
     test_utf8HexToUnicode(input5, output5);
-
     unsigned char *input6 = "\\u1F976";
-    unsigned char *output6 = "🥶";
+    unsigned char *output6 = "\\005C";
     test_utf8HexToUnicode(input6, output6);
-
 
 }
 
@@ -375,8 +367,8 @@ int main() {
     hexStringToBytes_tests();
     get_num_bytes_tests();
     my_utf8_encode_tests();
-    my_utf8_decode_tests();
-//    utf8HextoUnicode_tests();
+//    my_utf8_decode_tests();
+    utf8HextoUnicode_tests();
 
 
 

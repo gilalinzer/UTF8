@@ -26,7 +26,8 @@ unsigned char *next_utf8_char(unsigned char *string);
 
 //char *my_utf8_charat(char *string, int index): Returns the UTF8 encoded character at the location specified
 unsigned char *addZeros(unsigned char *relevant_bits, int zeroes_needed) {
-    char *new_bin = (char *) malloc(my_standard_strlen(relevant_bits) + 1);
+
+    char *new_bin = (unsigned char *) malloc(my_standard_strlen(relevant_bits) + zeroes_needed + 1);
     // add the zeros needed to the front of the relevant bits
     for (int i = 0; i < zeroes_needed; i++) {
         new_bin[i] = '0';
@@ -525,7 +526,7 @@ int encode_single_point(unsigned char *input , unsigned char* output){
         }
         new_bin[my_standard_strlen(relevant_bits)+2] = '\0'; // null terminate string
 
-        free(relevant_bits);  // Free the relevant bits - no longer needed
+
         relevant_bits = new_bin;
 
     }
@@ -558,7 +559,7 @@ int encode_single_point(unsigned char *input , unsigned char* output){
             new_bin[i] = relevant_bits[r_bits_index++];
         }
         new_bin[my_standard_strlen(new_bin)+1] = '\0'; // null terminate string
-        free(relevant_bits);  // Free the relevant bits - no longer needed
+
         relevant_bits = new_bin;
 
     }
@@ -598,7 +599,6 @@ int encode_single_point(unsigned char *input , unsigned char* output){
         }
         new_bin[my_standard_strlen(new_bin)+1] = '\0'; // null terminate string
 
-        free(relevant_bits);  // Free the relevant bits - no longer needed
         relevant_bits = new_bin;
     }
 
@@ -646,7 +646,7 @@ int encode_single_point(unsigned char *input , unsigned char* output){
             new_bin[i] = relevant_bits[r_bits_index++];
         }
         new_bin[my_standard_strlen(new_bin)] = '\0'; // null terminate string
-        free(relevant_bits);  // Free the relevant bits - no longer needed
+
         relevant_bits = new_bin;
     }
 
@@ -655,7 +655,7 @@ int encode_single_point(unsigned char *input , unsigned char* output){
 
     // convert the new binary to hex
     char* hex = BinToHex(relevant_bits);
-    free(relevant_bits);  // Free the relevant bits - no longer needed
+
     // Null terminate the hex string
     hex[my_standard_strlen(hex)] = '\0';
 
@@ -753,6 +753,9 @@ int my_utf8_encode(char *input, char *output) {
     output_String[my_standard_strlen(output_String)+1] = '\0';
 
     my_strcopy(output, front_of_output_string);
+
+    free(front_of_output_string);  // Free the output string - no longer needed
+
 
 
 
@@ -898,6 +901,7 @@ int utf8HexToUnicode(unsigned char *input, unsigned char *output){
     my_strcopy(output, unicode);
 
     free(unicode);  // Free the unicode string - no longer needed
+    free(hex_string);
 
 
     return 0;
