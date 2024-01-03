@@ -73,12 +73,8 @@ void printString(unsigned char *prefix, unsigned char *string, int length) {
 
 unsigned char* HexToBin(unsigned char* hexdec){
     int size = my_standard_strlen(hexdec);
-    char* result = (char*)malloc(size * 4 + 1);
+    char* result = (char*)malloc(size * 2 + 1);
 
-    if (result == NULL) {
-        fprintf(stderr, "Memory allocation error in HexToBin function\n");
-        exit(EXIT_FAILURE);
-    }
 
     int result_index = 0;
 
@@ -675,11 +671,12 @@ int my_utf8_encode(char *input, char *output) {
     // Assuming input is a string containing multiple Unicode points with no spaces
     // loop through the string and encode each point
     // pointer to be used later when converting to an array of bytes
-    char* output_String = (char*)malloc(my_standard_strlen(input) * 4 + 1);
+    char* output_String = (char*)malloc(my_standard_strlen(input) * 2 + 1);
     char* front_of_output_string = output_String;
     while (*input!='\0') {
 
-        if (input[0] != '\\' && input[1] != 'u') {
+        // if it's not a unicode point, just add it to the output string
+        if (input[0] != '\\' || input[1] != 'u') {
             // if it's not a unicode point, just add it to the output string
             *output_String = *input;
             output_String++;
@@ -756,6 +753,8 @@ int my_utf8_encode(char *input, char *output) {
     output_String[my_standard_strlen(output_String)+1] = '\0';
 
     my_strcopy(output, front_of_output_string);
+
+
 
 
     return 0;
@@ -900,6 +899,7 @@ int utf8HexToUnicode(unsigned char *input, unsigned char *output){
 
     free(unicode);  // Free the unicode string - no longer needed
 
+
     return 0;
 }
 
@@ -938,8 +938,8 @@ int my_utf8_decode(unsigned char *input, unsigned char *output) {
             output += my_standard_strlen(output);
             // increment the input pointer
             input += num_bytes;
-            // free the hex string - no longer needed
-            free(hex);
+
+
         }
 
     }
