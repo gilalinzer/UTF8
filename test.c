@@ -16,7 +16,7 @@ void test_utf8_strlen(unsigned char* string, int expected) {
 void test_my_strcopy(unsigned char* dest, unsigned char* src, unsigned char* expected) {
     my_strcopy(dest, src);
     printf("my_strcopy test %s: dest=%s, src=%s, expected=%s\n",
-           (my_utf8_strcmp(expected,src) ? "PASSED" : "FAILED"),
+           (!my_utf8_strcmp(expected,src) ? "PASSED" : "FAILED"),
            dest, src, expected);
 }
 
