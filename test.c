@@ -16,7 +16,7 @@ void test_utf8_strlen(unsigned char* string, int expected) {
 void test_my_strcopy(unsigned char* dest, unsigned char* src, unsigned char* expected) {
     my_strcopy(dest, src);
     printf("my_strcopy test %s: dest=%s, src=%s, expected=%s\n",
-           (*expected == *dest ? "PASSED" : "FAILED"),
+           (my_utf8_strcmp(expected,src) ? "PASSED" : "FAILED"),
            dest, src, expected);
 }
 
@@ -357,6 +357,47 @@ void my_utf8_strcmp_tests(){
     unsigned char *string20 = "a\xC3\xA9\xC3\xA9";
     int expected10 = 1;
 }
+void count_utf8_chars_tests() {
+    unsigned char *string = "a";
+    int expected = 0;
+    test_count_utf8_chars(string, expected);
+    unsigned char *string2 = "ab";
+    int expected2 = 0;
+    test_count_utf8_chars(string2, expected2);
+    unsigned char *string5 = "a\xC3\xA9";
+    int expected5 = 1;
+    test_count_utf8_chars(string5, expected5);
+    unsigned char *string6 = "a\xC3\xA9\xC3\xA9";
+    int expected6 = 2;
+    test_count_utf8_chars(string6, expected6);
+    unsigned char *string7 = "a גילה";
+    int expected7 = 4;
+    test_count_utf8_chars(string7, expected7);
+}
+void my_utf8_check_tests() {
+    unsigned char *string = "a";
+    int expected = 0;
+    test_my_utf8_check(string, expected);
+    unsigned char *string2 = "ab";
+    int expected2 = 0;
+    test_my_utf8_check(string2, expected2);
+    unsigned char *string3 = "a\xC3\xA9";
+    int expected3 = 0;
+    test_my_utf8_check(string3, expected3);
+    unsigned char *string4 = "a\xC3\xA9\xC3\xA9";
+    int expected4 = 0;
+    test_my_utf8_check(string4, expected4);
+    unsigned char *string5 = "a גילה";
+    int expected5 = 1;
+    test_my_utf8_check(string5, expected5);
+    // some fake utf8 strings that should fail the check
+    unsigned char *string6 = "\xFF";
+    int expected6 = 1;
+    test_my_utf8_check(string6, expected6);
+    unsigned char *string7 = "\xFF\xF6";
+    int expected7 = 1;
+    test_my_utf8_check(string7, expected7);
+}
 
 
 
@@ -371,6 +412,9 @@ int main() {
     get_num_bytes_tests();
     my_utf8_encode_tests();
     my_utf8_decode_tests();
+    my_utf8_strcmp_tests();
+    count_utf8_chars_tests();
+    my_utf8_check_tests();
 
 
     return 0;
