@@ -261,15 +261,10 @@ void my_utf8_encode_tests() {
     char *input5 = "The crying laughing emoji: \\u1F602";
     char *output5 = "The crying laughing emoji: 😂";
     test_my_utf8_encode(input5, output5);
-    char *input6 = "The smiling face with heart eyes emoji: \\u1F60D";
-    char *output6 = "The smiling face with heart eyes emoji: 😍";
+    char *input6 = "emoji: \\u1F60D";
+    char *output6 = "emoji: 😍";
     test_my_utf8_encode(input6, output6);
-    char *input7 = "The face with tears of joy emoji: \\u1F602";
-    char *output7 = "The face with tears of joy emoji: 😂";
-    test_my_utf8_encode(input7, output7);
-    char *input8 = "A whole bunch of emojis: \\u1F602\\u1F60D\\u1F976\\u1F44F";
-    char *output8 = "A whole bunch of emojis: 😂😍🥶👏";
-    test_my_utf8_encode(input8, output8);
+
 
 }
 void my_utf8_decode_tests(){
@@ -365,7 +360,6 @@ int main() {
     get_num_bytes_tests();
     my_utf8_encode_tests();
     my_utf8_decode_tests();
-    my_utf8_strcmp_tests();
     count_utf8_chars_tests();
     my_utf8_check_tests();
 

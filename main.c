@@ -687,11 +687,12 @@ int my_utf8_encode(char *input, char *output) {
         if (input[0] == '\\' && input[1] == 'u') {
             char *point = (char *) malloc(7);
             for (int i = 0; i < 6; i++) {
-                point[i] = input[i];
+                point[i] = *input;
+                input++;
             }
             // check the next character - it could be the unicode has 7 characters
             // if it's a slash or space the unicode has 6 characters and is done
-            if (input[6] == '\\' || input[6] == ' ') {
+            if (*input == '\\' || *input == ' ') {
                 point[6] = '\0'; // null terminate string
                 // encode the point and add it to the output string
                 char* hex_String = (char*)malloc(my_standard_strlen(point) * 2 + 1);
@@ -702,24 +703,24 @@ int my_utf8_encode(char *input, char *output) {
                 // the array will be written to the output parameter
 
                 // increment the hex string pointer to the next location
-                hex_String += my_standard_strlen(hex_String)+1;
+                hex_String += my_standard_strlen(hex_String);
                 // Convert the hexadecimal string to bytes
                 hexStringToBytes(front_of_hexstring, hex_String);
 
                 // Null-terminate the array
-                hex_String[my_standard_strlen(hex_String)+1] = '\0';
+                //hex_String[my_standard_strlen(hex_String)+1] = '\0';
 
                 // copy the hex string to the output string
                 my_strcopy(output_String, hex_String);
 
                 // move the pointer to the next location
-                output_String += my_standard_strlen(output_String)+1;
+                output_String += my_standard_strlen(output_String);
 
-                // move to the next point - 6 characters ahead
-                input += 6;
+
+
             } else {
-                // if it's not a slash, the unicode has 7 characters
-                point[6] = input[6];
+                // if it's not a slash, the unicode has 7 characters - add the next character
+                point[6] = *input;
                 point[7] = '\0'; // null terminate string
                 char* hex_String = (char*)malloc(32);
                 char* front_of_hexstring = hex_String;
@@ -728,29 +729,31 @@ int my_utf8_encode(char *input, char *output) {
                 // Passing in a pointer to the front of the hex string that was saved in front_of_output_string earlier
                 // the array will be written to the output parameter
 
+                int length_of_hex_string = my_standard_strlen(hex_String);
+
                 // increment the hex string pointer to the next location
-                hex_String += my_standard_strlen(hex_String)+1;
+                hex_String += my_standard_strlen(hex_String);
                 // Convert the hexadecimal string to bytes
                 hexStringToBytes(front_of_hexstring, hex_String);
 
                 // Null-terminate the array and this time using the standard strlen because this might be utf8 encoded
-                hex_String[my_standard_strlen(hex_String)+1] = '\0';
+                hex_String[my_standard_strlen(hex_String)] = '\0';
 
                 // copy the hex string to the output string
                 my_strcopy(output_String, hex_String);
 
                 // move the pointer to the next location
-                output_String += my_standard_strlen(output_String)+3;
+                output_String += length_of_hex_string;
                 // move to the next point - 7 characters ahead
-                input += 7;
+                input +=6;
             }
 
-            free(point);  // Free the point - no longer needed
+
 
         }
     }
     // Null-terminate the output string
-    output_String[my_standard_strlen(output_String)+1] = '\0';
+    output_String[my_standard_strlen(output_String)] = '\0';
 
     my_strcopy(output, front_of_output_string);
 
