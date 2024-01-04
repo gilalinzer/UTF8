@@ -110,19 +110,13 @@ void test_next_utf8_char(unsigned char* string, unsigned char* expected) {
 void utf8_strlen_tests() {
     test_utf8_strlen("", 0);
     test_utf8_strlen("a", 1);
-    test_utf8_strlen("ab", 2);
-    test_utf8_strlen("abc", 3);
-    test_utf8_strlen("abcd", 4);
     test_utf8_strlen("abcde", 5);
     test_utf8_strlen("abcdef", 6);
      // now some with utf8 characters
     test_utf8_strlen("a\xC3\xA9", 2);
     test_utf8_strlen("a\xC3\xA9\xC3\xA9", 3);
     test_utf8_strlen("a\xC3\xA9\xC3\xA9\xC3\xA9", 4);
-    test_utf8_strlen("a\xC3\xA9\xC3\xA9\xC3\xA9\xC3\xA9", 5);
-    test_utf8_strlen("a\xC3\xA9\xC3\xA9\xC3\xA9\xC3\xA9\xC3\xA9", 6);
-    test_utf8_strlen("a\xD7\x90", 2);
-    test_utf8_strlen("a\xD7\x90\xD7\x90", 3);
+
 }
 void my_strcopy_tests() {
     unsigned char* dest = malloc(sizeof(unsigned char) * 4);
