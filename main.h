@@ -20,5 +20,7 @@ int my_utf8_check(unsigned char *string);
 unsigned char *my_utf8_charat(unsigned char *string, int index);
 int my_utf8_encode(char *input, char *output);
 unsigned char *next_utf8_char(unsigned char *string);
+unsigned char* reverse_utf8_string(unsigned char *string);
+
 
 #endif //UTF8_MAIN_H

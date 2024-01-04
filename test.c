@@ -42,7 +42,7 @@ void test_BinToHex(unsigned char* bin, unsigned char* expected) {
 }
 
 void test_hexStringToBytes(unsigned char* hexString, unsigned char* expected) {
-    unsigned char* actual = malloc(sizeof(unsigned char) * 4);
+    unsigned char* actual = malloc(my_standard_strlen(expected)+1);
     hexStringToBytes(hexString, actual);
     printf("hexStringToBytes test %s: hexString=%s, expected=%s, actual=%s\n",
            (!my_utf8_strcmp(expected,actual) ? "PASSED" : "FAILED"),
@@ -57,7 +57,7 @@ void test_get_num_bytes(unsigned char* string, int expected) {
 }
 
 void test_my_utf8_encode(char* input, char* expected) {
-    char* actual = malloc(my_standard_strlen(expected) * 4);
+    char* actual = malloc(my_standard_strlen(expected)+1);
     my_utf8_encode(input, actual);
     printf("my_utf8_encode test %s: input=%s, expected=%s, actual=%s\n",
            (!my_utf8_strcmp(expected,actual) ? "PASSED" : "FAILED"),
@@ -65,7 +65,7 @@ void test_my_utf8_encode(char* input, char* expected) {
 }
 
 void test_my_utf8_decode(unsigned char* input, unsigned char* expected) {
-    unsigned char* actual = calloc(sizeof(unsigned char) * 2,1);
+    unsigned char* actual = malloc(my_standard_strlen(expected)+1);
     my_utf8_decode(input, actual);
     printf("my_utf8_decode test %s: input=%s, expected=%s, actual=%s\n",
            (!my_utf8_strcmp(expected,actual) ? "PASSED" : "FAILED"),
@@ -97,6 +97,13 @@ void test_my_utf8_charat(unsigned char* string, int index, unsigned char* expect
 void test_next_utf8_char(unsigned char* string, unsigned char* expected) {
     unsigned char* actual = next_utf8_char(string);
     printf("next_utf8_char test %s: string=%s, expected=%s, actual=%s\n",
+           (!my_utf8_strcmp(expected,actual) ? "PASSED" : "FAILED"),
+           string, expected, actual);
+}
+
+void test_reverse_utf8_string(unsigned char* string, unsigned char* expected) {
+    unsigned char* actual = reverse_utf8_string(string);
+    printf("reverse_utf8_string test %s: string=%s, expected=%s, actual=%s\n",
            (!my_utf8_strcmp(expected,actual) ? "PASSED" : "FAILED"),
            string, expected, actual);
 }
@@ -264,6 +271,12 @@ void my_utf8_encode_tests() {
     char *input6 = "emoji: \\u1F60D";
     char *output6 = "emoji: 😍";
     test_my_utf8_encode(input6, output6);
+    char *input7 = "emojis: \\u1F602 now the heart one \\u1F60D";
+    char *output7 = "emojis: 😂 now the heart one 😍";
+    test_my_utf8_encode(input7, output7);
+    char *input8 = "emojis: \\u1F602\\u1F60D\\u1F976\\u1F44F with text after";
+    char *output8 = "emojis: 😂😍🥶👏 with text after";
+    test_my_utf8_encode(input8, output8);
 
 
 }
@@ -292,15 +305,15 @@ void my_utf8_decode_tests(){
     unsigned char *input5 = "😂";
     unsigned char *output5 = "\\u1F602";
     test_my_utf8_decode(input5, output5);
-    unsigned char *input6 = "The smiling face with heart eyes emoji: 😍";
-    unsigned char *output6 = "The smiling face with heart eyes emoji: \\u1F60D";
+    unsigned char *input6 = "😍";
+    unsigned char *output6 = "\\u1F60D";
     test_my_utf8_decode(input6, output6);
-    unsigned char *input7 = "The face with tears of joy emoji: 😂";
-    unsigned char *output7 = "The face with tears of joy emoji: \\u1F602";
-    test_my_utf8_decode(input7, output7);
-    unsigned char *input8 = "A whole bunch of emojis: 😂😍🥶👏";
-    unsigned char *output8 = "A whole bunch of emojis: \\u1F602\\u1F60D\\u1F976\\u1F44F";
+    unsigned char *input8 = "emojis: 😂😍🥶👏";
+    unsigned char *output8 = "emojis: \\u1F602\\u1F60D\\u1F976\\u1F44F";
     test_my_utf8_decode(input8, output8);
+    unsigned char *input9 = "many kinds of emojis 😂😍🥶👏 with text after";
+    unsigned char *output9 = "many kinds of emojis \\u1F602\\u1F60D\\u1F976\\u1F44F with text after";
+    test_my_utf8_decode(input9, output9);
 
 
 
@@ -347,6 +360,72 @@ void my_utf8_check_tests() {
     test_my_utf8_check(string7, expected7);
 }
 
+void my_utf8_charat_tests() {
+    unsigned char *string = "a";
+    int index = 0;
+    unsigned char *expected = "a";
+    test_my_utf8_charat(string, index, expected);
+    unsigned char *string2 = "ab";
+    int index2 = 1;
+    unsigned char *expected2 = "b";
+    test_my_utf8_charat(string2, index2, expected2);
+    unsigned char *string3 = "a\xC3\xA9";
+    int index3 = 1;
+    unsigned char *expected3 = "\xC3\xA9";
+    test_my_utf8_charat(string3, index3, expected3);
+    unsigned char *string4 = "a\xC3\xA9\xC3\xA9";
+    int index4 = 2;
+    unsigned char *expected4 = "\xC3\xA9";
+    test_my_utf8_charat(string4, index4, expected4);
+    unsigned char *string5 = "a גילה";
+    int index5 = 2;
+    unsigned char *expected5 = "גילה";
+    test_my_utf8_charat(string5, index5, expected5);
+    unsigned char *string6 = "a גילה";
+    int index6 = 3;
+    unsigned char *expected6 = "ילה";
+    test_my_utf8_charat(string6, index6, expected6);
+}
+void next_utf8_char_tests() {
+    unsigned char *string = "a";
+    unsigned char *expected = "";
+    test_next_utf8_char(string, expected);
+    unsigned char *string2 = "ab";
+    unsigned char *expected2 = "b";
+    test_next_utf8_char(string2, expected2);
+    unsigned char *string3 = "a\xC3\xA9";
+    unsigned char *expected3 = "\xC3\xA9";
+    test_next_utf8_char(string3, expected3);
+    unsigned char *string4 = "\xC3\xA9\xC3\xA9";
+    unsigned char *expected4 = "\xC3\xA9";
+    test_next_utf8_char(string4, expected4);
+    unsigned char *string5 = "a גילה";
+    unsigned char *expected5 = "גילה ";
+    test_next_utf8_char(string5, expected5);
+    unsigned char *string6 = "גילה";
+    unsigned char *expected6 = "ילה";
+    test_next_utf8_char(string6, expected6);
+    unsigned char *string7 = "🌈🤢";
+    unsigned char *expected7 = "🤢";
+    test_next_utf8_char(string7, expected7);
+}
+void reverse_utf8_string_tests() {
+    unsigned char *string = "a";
+    unsigned char *expected = "a";
+    test_reverse_utf8_string(string, expected);
+    unsigned char *string2 = "ab";
+    unsigned char *expected2 = "ba";
+    test_reverse_utf8_string(string2, expected2);
+    unsigned char *string3 = "a \xC3\xA9";
+    unsigned char *expected3 = "\xC3\xA9 a";
+    test_reverse_utf8_string(string3, expected3);
+    unsigned char *string4 = "a \xC3\xA9\xC3\xA9";
+    unsigned char *expected4 = "\xC3\xA9\xC3\xA9 a";
+    test_reverse_utf8_string(string4, expected4);
+    unsigned char *string5 = "גילה";
+    unsigned char *expected5 = "הליג";
+    test_reverse_utf8_string(string5, expected5);
+}
 
 
 
@@ -362,6 +441,11 @@ int main() {
     my_utf8_decode_tests();
     count_utf8_chars_tests();
     my_utf8_check_tests();
+    my_utf8_charat_tests();
+    next_utf8_char_tests();
+    reverse_utf8_string_tests();
+
+
 
 
     return 0;
