@@ -8,7 +8,7 @@ void my_strcopy(unsigned char *dest, unsigned char *src);
 unsigned char *addZeros(unsigned char *relevant_bits, int zeroes_needed);
 unsigned char* HexToBin(unsigned char* hexdec);
 unsigned char* BinToHex(unsigned char* bin);
-void hexStringToBytes(unsigned char* hexString, unsigned char* bytes);
+int hexStringToBytes(unsigned char* hexString, unsigned char* bytes);
 int get_num_bytes(unsigned char *string);
 int my_utf8_decode(unsigned char *input, unsigned char *output);
 int encode_single_point(unsigned char *input , unsigned char* output);

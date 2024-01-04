@@ -9,7 +9,7 @@ void my_strcopy(unsigned char *dest, unsigned char *src);
 unsigned char *addZeros(unsigned char *relevant_bits, int zeroes_needed);
 unsigned char* HexToBin(unsigned char* hexdec);
 unsigned char* BinToHex(unsigned char* bin);
-void hexStringToBytes(unsigned char* hexString, unsigned char* bytes);
+int hexStringToBytes(unsigned char* hexString, unsigned char* bytes);
 int get_num_bytes(unsigned char *string);
 int my_utf8_decode(unsigned char *input, unsigned char *output);
 int encode_single_point(unsigned char *input , unsigned char* output);
@@ -406,12 +406,11 @@ unsigned char* BinToHex(unsigned char* bin){
 }
 
 // Function to convert a hexadecimal string to an array of bytes
-void hexStringToBytes(unsigned char* hexString, unsigned char* bytes) {
+int hexStringToBytes(unsigned char* hexString, unsigned char* bytes) {
     size_t len = my_standard_strlen(hexString);
-
+    // make sure it's even
     if (len % 2 != 0) {
-        fprintf(stderr, "Error: Hex string length must be even.\n");
-        return;
+        return 1;
     }
 
     size_t byteLen = len / 2;
@@ -423,6 +422,7 @@ void hexStringToBytes(unsigned char* hexString, unsigned char* bytes) {
         sscanf(hexPair, "%2hhX", &bytes[i]);
 
     }
+    return 0;
 }
 
 // Helper function for encode - go from unicode to UTF8 for a single point
