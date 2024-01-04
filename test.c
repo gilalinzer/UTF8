@@ -316,6 +316,47 @@ void my_utf8_decode_tests(){
 
 
 }
+void my_utf8_strcmp_tests(){
+    unsigned char *string1 = "a";
+    unsigned char *string2 = "a";
+    int expected = 0;
+    test_my_utf8_strcmp(string1, string2, expected);
+    unsigned char *string3 = "a";
+    unsigned char *string4 = "b";
+    int expected2 = 1;
+    test_my_utf8_strcmp(string3, string4, expected2);
+    unsigned char *string5 = "b";
+    unsigned char *string6 = "a";
+    int expected3 = 1;
+    test_my_utf8_strcmp(string5, string6, expected3);
+    unsigned char *string7 = "abc";
+    unsigned char *string8 = "abc";
+    int expected4 = 0;
+    test_my_utf8_strcmp(string7, string8, expected4);
+    unsigned char *string9 = "abc";
+    unsigned char *string10 = "abcd";
+    int expected5 = 1;
+    test_my_utf8_strcmp(string9, string10, expected5);
+    unsigned char *string11 = "abcd";
+    unsigned char *string12 = "abc";
+    int expected6 = 1;
+    test_my_utf8_strcmp(string11, string12, expected6);
+    unsigned char *string13 = "a\xC3\xA9";
+    unsigned char *string14 = "a\xC3\xA9";
+    int expected7 = 0;
+    test_my_utf8_strcmp(string13, string14, expected7);
+    unsigned char *string15 = "a\xC3\xA9";
+    unsigned char *string16 = "a\xC3\xA8";
+    int expected8 = 1;
+    test_my_utf8_strcmp(string15, string16, expected8);
+    unsigned char *string17 = "a\xC3\xA8";
+    unsigned char *string18 = "a\xC3\xA9";
+    int expected9 = 1;
+    test_my_utf8_strcmp(string17, string18, expected9);
+    unsigned char *string19 = "a\xC3\xA9";
+    unsigned char *string20 = "a\xC3\xA9\xC3\xA9";
+    int expected10 = 1;
+}
 
 
 
