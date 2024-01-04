@@ -279,6 +279,7 @@ void my_utf8_encode_tests() {
     test_my_utf8_encode(input8, output8);
 
 
+
 }
 void my_utf8_decode_tests(){
     // test with a single utf8 character
@@ -314,6 +315,7 @@ void my_utf8_decode_tests(){
     unsigned char *input9 = "many kinds of emojis 😂😍🥶👏 with text after";
     unsigned char *output9 = "many kinds of emojis \\u1F602\\u1F60D\\u1F976\\u1F44F with text after";
     test_my_utf8_decode(input9, output9);
+
 
 
 

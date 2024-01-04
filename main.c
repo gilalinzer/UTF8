@@ -2,7 +2,6 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
-bool debug = false;
 
 // function declarations
 int utf8_strlen(unsigned char *string);
