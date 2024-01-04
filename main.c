@@ -415,11 +415,6 @@ unsigned char* BinToHex(unsigned char* bin){
 void hexStringToBytes(unsigned char* hexString, unsigned char* bytes) {
     size_t len = my_standard_strlen(hexString);
 
-    if (len % 2 != 0) {
-        fprintf(stderr, "Error: Hex string length must be even.\n");
-        return;
-    }
-
     size_t byteLen = len / 2;
 
     for (size_t i = 0; i < byteLen; i++) {
@@ -486,6 +481,9 @@ int encode_single_point(unsigned char *input , unsigned char* output){
 
     }
 
+    // null terminate the relevant bits string
+    relevant_bits[result_index] = '\0';
+
 
 
     // step 3: map the bits to the template for the UTF8 encoding
@@ -508,9 +506,6 @@ int encode_single_point(unsigned char *input , unsigned char* output){
     else if (num_bits <= four_byte_max) {
         num_bytes = 4;
     }
-
-
-
 
     // 1 byte: 0xxxxxxx
     if (num_bytes==1) {
@@ -654,9 +649,6 @@ int encode_single_point(unsigned char *input , unsigned char* output){
         relevant_bits = new_bin;
     }
 
-
-
-
     // convert the new binary to hex
     char* hex = BinToHex(relevant_bits);
 
@@ -711,7 +703,7 @@ int my_utf8_encode(char *input, char *output) {
                 hexStringToBytes(front_of_hexstring, hex_String);
 
                 // Null-terminate the array
-                hex_String[my_standard_strlen(hex_String)+1] = '\0';
+                hex_String[my_standard_strlen(hex_String)] = '\0';
 
                 // copy the hex string to the output string
                 my_strcopy(output_String, hex_String);
@@ -738,7 +730,7 @@ int my_utf8_encode(char *input, char *output) {
                 hexStringToBytes(front_of_hexstring, hex_String);
 
                 // Null-terminate the array and this time using the standard strlen because this might be utf8 encoded
-                hex_String[my_standard_strlen(hex_String)+1] = '\0';
+                hex_String[my_standard_strlen(hex_String)] = '\0';
 
                 // copy the hex string to the output string
                 my_strcopy(output_String, hex_String);
@@ -754,12 +746,11 @@ int my_utf8_encode(char *input, char *output) {
         }
     }
     // Null-terminate the output string
-    output_String[my_standard_strlen(output_String)+1] = '\0';
+    output_String[my_standard_strlen(output_String)] = '\0';
 
     my_strcopy(output, front_of_output_string);
 
-    free(front_of_output_string);  // Free the output string - no longer needed
-
+    //free(front_of_output_string);  // Free the output string - no longer needed
 
 
     return 0;
@@ -782,12 +773,15 @@ int utf8HexToUnicode(unsigned char *input, unsigned char *output){
         // %02X - format specifier for hex the 2 means no more than 2 characters
         snprintf(hex_string+i*2, 3, "%2X", input[i]);
     }
-    hex_string[get_num_bytes(input)*2+1] = '\0'; // null terminate string
+    hex_string[get_num_bytes(input)*2] = '\0'; // null terminate string
 
 
     // pass that hex string into the HexToBin function to get the binary string
 
     char *bin = HexToBin(hex_string);
+
+    // free the hex string - no longer needed
+
 
 
     // step two - determine the number of bytes used
@@ -851,7 +845,7 @@ int utf8HexToUnicode(unsigned char *input, unsigned char *output){
 
         // convert the relevant bits to hex
         char *hex = BinToHex(relevant_bits);
-        free(relevant_bits);  // Free the relevant bits - no longer needed
+
         // add the unicode prefix to the hex string and add zeroes if needed
         unicode[0] = '\\';
         unicode[1] = 'u';
@@ -902,8 +896,6 @@ int utf8HexToUnicode(unsigned char *input, unsigned char *output){
     // copy the unicode string to the output parameter
     my_strcopy(output, unicode);
 
-    free(unicode);  // Free the unicode string - no longer needed
-    free(hex_string);
 
     return 0;
 }
@@ -944,7 +936,7 @@ int my_utf8_decode(unsigned char *input, unsigned char *output) {
             // increment the input pointer
             input += num_bytes;
             // free the hex string - no longer needed
-            free(hex);
+
         }
 
     }
