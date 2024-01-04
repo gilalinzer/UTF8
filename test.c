@@ -23,21 +23,21 @@ void test_my_strcopy(unsigned char* dest, unsigned char* src, unsigned char* exp
 void test_addZeros(unsigned char* relevant_bits, int zeroes_needed, unsigned char* expected) {
     unsigned char* actual = addZeros(relevant_bits, zeroes_needed);
     printf("addZeros test %s: relevant_bits=%s, zeroes_needed=%d, expected=%s, actual=%s\n",
-           (*expected == *actual ? "PASSED" : "FAILED"),
+           (!my_utf8_strcmp(expected,actual) ? "PASSED" : "FAILED"),
            relevant_bits, zeroes_needed, expected, actual);
 }
 
 void test_HexToBin(unsigned char* hexdec, unsigned char* expected) {
     unsigned char* actual = HexToBin(hexdec);
     printf("HexToBin test %s: hexdec=%s, expected=%s, actual=%s\n",
-           (*expected == *actual ? "PASSED" : "FAILED"),
+           (!my_utf8_strcmp(expected,actual) ? "PASSED" : "FAILED"),
            hexdec, expected, actual);
 }
 
 void test_BinToHex(unsigned char* bin, unsigned char* expected) {
     unsigned char* actual = BinToHex(bin);
     printf("BinToHex test %s: bin=%s, expected=%s, actual=%s\n",
-           (*expected == *actual ? "PASSED" : "FAILED"),
+           (!my_utf8_strcmp(expected,actual) ? "PASSED" : "FAILED"),
            bin, expected, actual);
 }
 
@@ -45,7 +45,7 @@ void test_hexStringToBytes(unsigned char* hexString, unsigned char* expected) {
     unsigned char* actual = malloc(sizeof(unsigned char) * 4);
     hexStringToBytes(hexString, actual);
     printf("hexStringToBytes test %s: hexString=%s, expected=%s, actual=%s\n",
-           (*expected == *actual ? "PASSED" : "FAILED"),
+           (!my_utf8_strcmp(expected,actual) ? "PASSED" : "FAILED"),
            hexString, expected, actual);
 }
 
@@ -60,7 +60,7 @@ void test_my_utf8_encode(char* input, char* expected) {
     char* actual = malloc(my_standard_strlen(expected) * 4);
     my_utf8_encode(input, actual);
     printf("my_utf8_encode test %s: input=%s, expected=%s, actual=%s\n",
-           (*expected == *actual ? "PASSED" : "FAILED"),
+           (!my_utf8_strcmp(expected,actual) ? "PASSED" : "FAILED"),
            input, expected, actual);
 }
 
@@ -68,16 +68,10 @@ void test_my_utf8_decode(unsigned char* input, unsigned char* expected) {
     unsigned char* actual = malloc(sizeof(unsigned char) * 4);
     my_utf8_decode(input, actual);
     printf("my_utf8_decode test %s: input=%s, expected=%s, actual=%s\n",
-           (*expected == *actual ? "PASSED" : "FAILED"),
+           (!my_utf8_strcmp(expected,actual) ? "PASSED" : "FAILED"),
            input, expected, actual);
 }
 
-void test_my_utf8_strcmp(unsigned char* string1, unsigned char* string2, int expected) {
-    int actual = my_utf8_strcmp(string1, string2);
-    printf("my_utf8_strcmp test %s: string1=%s, string2=%s, expected=%d, actual=%d\n",
-           (expected == actual ? "PASSED" : "FAILED"),
-           string1, string2, expected, actual);
-}
 
 void test_count_utf8_chars(unsigned char* string, int expected) {
     int actual = count_utf8_chars(string);
@@ -96,14 +90,14 @@ void test_my_utf8_check(unsigned char* string, int expected) {
 void test_my_utf8_charat(unsigned char* string, int index, unsigned char* expected) {
     unsigned char* actual = my_utf8_charat(string, index);
     printf("my_utf8_charat test %s: string=%s, index=%d, expected=%s, actual=%s\n",
-           (expected == actual ? "PASSED" : "FAILED"),
+           (!my_utf8_strcmp(expected,actual) ? "PASSED" : "FAILED"),
            string, index, expected, actual);
 }
 
 void test_next_utf8_char(unsigned char* string, unsigned char* expected) {
     unsigned char* actual = next_utf8_char(string);
     printf("next_utf8_char test %s: string=%s, expected=%s, actual=%s\n",
-           (expected == actual ? "PASSED" : "FAILED"),
+           (!my_utf8_strcmp(expected,actual) ? "PASSED" : "FAILED"),
            string, expected, actual);
 }
 
@@ -315,47 +309,6 @@ void my_utf8_decode_tests(){
 
 
 
-}
-void my_utf8_strcmp_tests(){
-    unsigned char *string1 = "a";
-    unsigned char *string2 = "a";
-    int expected = 0;
-    test_my_utf8_strcmp(string1, string2, expected);
-    unsigned char *string3 = "a";
-    unsigned char *string4 = "b";
-    int expected2 = 1;
-    test_my_utf8_strcmp(string3, string4, expected2);
-    unsigned char *string5 = "b";
-    unsigned char *string6 = "a";
-    int expected3 = 1;
-    test_my_utf8_strcmp(string5, string6, expected3);
-    unsigned char *string7 = "abc";
-    unsigned char *string8 = "abc";
-    int expected4 = 0;
-    test_my_utf8_strcmp(string7, string8, expected4);
-    unsigned char *string9 = "abc";
-    unsigned char *string10 = "abcd";
-    int expected5 = 1;
-    test_my_utf8_strcmp(string9, string10, expected5);
-    unsigned char *string11 = "abcd";
-    unsigned char *string12 = "abc";
-    int expected6 = 1;
-    test_my_utf8_strcmp(string11, string12, expected6);
-    unsigned char *string13 = "a\xC3\xA9";
-    unsigned char *string14 = "a\xC3\xA9";
-    int expected7 = 0;
-    test_my_utf8_strcmp(string13, string14, expected7);
-    unsigned char *string15 = "a\xC3\xA9";
-    unsigned char *string16 = "a\xC3\xA8";
-    int expected8 = 1;
-    test_my_utf8_strcmp(string15, string16, expected8);
-    unsigned char *string17 = "a\xC3\xA8";
-    unsigned char *string18 = "a\xC3\xA9";
-    int expected9 = 1;
-    test_my_utf8_strcmp(string17, string18, expected9);
-    unsigned char *string19 = "a\xC3\xA9";
-    unsigned char *string20 = "a\xC3\xA9\xC3\xA9";
-    int expected10 = 1;
 }
 void count_utf8_chars_tests() {
     unsigned char *string = "a";
