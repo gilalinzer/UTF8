@@ -745,7 +745,7 @@ int my_utf8_encode(char *input, char *output) {
                 // move the pointer to the next location
                 output_String += length_of_hex_string;
                 // move to the next point - 7 characters ahead
-                input +=6;
+                input +=7;
             }
 
 
@@ -914,6 +914,7 @@ int utf8HexToUnicode(unsigned char *input, unsigned char *output){
 // Function to decode multiple UTF-8 hex values
 // Function to decode multiple UTF-8 encoded points
 int my_utf8_decode(unsigned char *input, unsigned char *output) {
+    unsigned char * front_of_output = output;
     while (*input != '\0') {
         // get the number of bytes for the character
         int num_bytes = get_num_bytes(input);
@@ -926,7 +927,7 @@ int my_utf8_decode(unsigned char *input, unsigned char *output) {
             // copy the current character to the output string
             *output = *input;
             // move the output pointer
-            output += my_standard_strlen(output);
+            output ++;
             // increment the input pointer one byte
             input++;
         }
@@ -941,8 +942,13 @@ int my_utf8_decode(unsigned char *input, unsigned char *output) {
             hex[num_bytes] = '\0'; // null terminate string
             // decode the hex string to unicode
             utf8HexToUnicode(hex, output);
-            // move the output pointer
-            output += my_standard_strlen(output);
+            // move the output pointer based on the size of the unicode
+            if (num_bytes<=3){
+                output+=6;
+            }
+            else{
+                output+=7;
+            }
             // increment the input pointer
             input += num_bytes;
 
@@ -950,6 +956,8 @@ int my_utf8_decode(unsigned char *input, unsigned char *output) {
         }
 
     }
+    output++;
+    output ="\0";
 
     return 0;
 }

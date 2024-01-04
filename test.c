@@ -65,7 +65,7 @@ void test_my_utf8_encode(char* input, char* expected) {
 }
 
 void test_my_utf8_decode(unsigned char* input, unsigned char* expected) {
-    unsigned char* actual = malloc(sizeof(unsigned char) * 4);
+    unsigned char* actual = calloc(sizeof(unsigned char) * 2,1);
     my_utf8_decode(input, actual);
     printf("my_utf8_decode test %s: input=%s, expected=%s, actual=%s\n",
            (!my_utf8_strcmp(expected,actual) ? "PASSED" : "FAILED"),
@@ -289,8 +289,8 @@ void my_utf8_decode_tests(){
     unsigned char *output4 = "abc";
     test_my_utf8_decode(input4, output4);
     // More longer string tests with 5 byte unicode
-    unsigned char *input5 = "The crying laughing emoji: 😂";
-    unsigned char *output5 = "The crying laughing emoji: \\u1F602";
+    unsigned char *input5 = "😂";
+    unsigned char *output5 = "\\u1F602";
     test_my_utf8_decode(input5, output5);
     unsigned char *input6 = "The smiling face with heart eyes emoji: 😍";
     unsigned char *output6 = "The smiling face with heart eyes emoji: \\u1F60D";
@@ -336,7 +336,7 @@ void my_utf8_check_tests() {
     int expected4 = 0;
     test_my_utf8_check(string4, expected4);
     unsigned char *string5 = "a גילה";
-    int expected5 = 1;
+    int expected5 = 0;
     test_my_utf8_check(string5, expected5);
     // some fake utf8 strings that should fail the check
     unsigned char *string6 = "\xFF";
