@@ -897,12 +897,12 @@ int utf8HexToUnicode(unsigned char *input, unsigned char *output){
                 unicode[8] = '\0'; // null terminate string
             }
             else{
-                return -1;
+                return 1;
             }
         }
 
         else{
-            return -1;
+            return 1;
         }
 
     // copy the unicode string to the output parameter
@@ -1148,8 +1148,14 @@ unsigned char *my_utf8_charat(unsigned char *string, int index){
     }
 
     // once the loop has been exited - the pointer is now pointing to the start of the character at the index
-    // return the pointer
-    return string;
+    // make the character you found is valid utf8 using "check"
+    if (my_utf8_check(string)==0){
+        return string;
+    }
+    else{
+        return NULL;
+    }
+
 }
 
 // This creative function takes in a string and returns the number of utf8 characters (non-ascii) in the string
